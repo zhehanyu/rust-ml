@@ -3,9 +3,7 @@ mod process_data;
 
 use ndarray::prelude::*;
 fn main() {
-    let arr1 = array![
-        [1,2,5],
-        [8,14,23],
-        [37,45,53]
-    ];
+    let arr1: ArrayBase<ndarray::OwnedRepr<f64>, Dim<[usize; 2]>> = Array::zeros((3,4));
+    let x = arr1.columns();
+    println!("{:#?}", arr1);
 }
