@@ -5,7 +5,9 @@ use std::path::Path;
 use ndarray::prelude::*;
 use plotters::prelude::*;
 
-type FloatMatrix = ArrayBase<ndarray::OwnedRepr<f64>, ndarray::Dim<[usize; 2]>>;
+pub type OwnedFloatMatrix = ArrayBase<ndarray::OwnedRepr<f64>, ndarray::Dim<[usize; 2]>>;
+pub type ViewFloatMatrix<'a> = ArrayBase<ndarray::ViewRepr<&'a f64>, ndarray::Dim<[usize; 2]>>;
+pub type ViewMutFloatMatrix<'a> = ArrayBase<ndarray::ViewRepr<&'a mut f64>, ndarray::Dim<[usize; 2]>>;
 
 pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
@@ -13,11 +15,11 @@ where P: AsRef<Path>, {
     Ok(io::BufReader::new(file).lines())
 }
 
-pub fn read_float_matrix<P>(filename: P) -> Option<FloatMatrix>
+pub fn read_float_matrix<P>(filename: P) -> Option<OwnedFloatMatrix>
 where P: AsRef<Path>, {
     if let Ok(lines) = read_lines(filename) {
         let mut row_number = 0;
-        let mut colume_number = 0;
+        let mut column_number = 0;
 
         let mut temp = Vec::new();
         for line in lines {
@@ -27,15 +29,15 @@ where P: AsRef<Path>, {
                 x.parse().unwrap()
             }).collect();
 
-            if colume_number != 0 && colume_number != row.len() {
+            if column_number != 0 && column_number != row.len() {
                 return None;
             }
-            colume_number = row.len();
+            column_number = row.len();
             temp.push(row);
         }
-        let mut res = Array::zeros((row_number, colume_number));
+        let mut res = Array::zeros((row_number, column_number));
         for i in 0..row_number {
-            for j in 0..colume_number {
+            for j in 0..column_number {
                 res[[i,j]] = temp[i][j];
             }
         }
@@ -45,9 +47,9 @@ where P: AsRef<Path>, {
     }
 }
 
-pub fn plot_data(data: FloatMatrix) -> Result<(), Box<dyn std::error::Error>> {
+pub fn plot_data(data: ViewFloatMatrix, path: &str) -> Result<(), Box<dyn std::error::Error>> {
     // 创建svg图片对象
-    let root = SVGBackend::new("plot.svg", (640, 480)).into_drawing_area();
+    let root = SVGBackend::new(path, (640, 480)).into_drawing_area();
     // 图片对象的背景颜色填充
     root.fill(&WHITE)?;
     // 创建绘图对象
