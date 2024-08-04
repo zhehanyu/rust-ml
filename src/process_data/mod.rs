@@ -47,6 +47,18 @@ where P: AsRef<Path>, {
     }
 }
 
+pub fn normolized(mut raw_data: OwnedFloatMatrix, skip_last_column: bool) -> OwnedFloatMatrix {
+    let res = Array2::from_shape_fn(raw_data.dim(), |(i,j)| {
+        if skip_last_column && j == raw_data.ncols() - 1 {
+            raw_data[[i,j]]
+        } else {
+            (raw_data[[i,j]] - raw_data.mean_axis(Axis(0)).unwrap()[j]) / raw_data.std_axis(Axis(0), 1.0)[j]
+        }
+    });
+
+    res
+}
+
 pub fn plot_data(data: ViewFloatMatrix, path: &str) -> Result<(), Box<dyn std::error::Error>> {
     // 创建svg图片对象
     let root = SVGBackend::new(path, (640, 480)).into_drawing_area();

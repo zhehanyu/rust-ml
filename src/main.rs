@@ -1,5 +1,7 @@
 mod linear_regression;
+mod logistic_regression;
 mod process_data;
+
 
 use rust_ml::*;
 
