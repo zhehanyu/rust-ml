@@ -10,5 +10,6 @@ use ndarray::prelude::*;
 
 
 fn main() -> Result<()>{
+    println!("test git!");
     Ok(())
 }
